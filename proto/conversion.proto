@@ -1,0 +1,9 @@
+syntax = "proto3";
+package proto;
+
+// Conversion is strictly from Excel to PDF
+
+message ConversionRequest   { string filePath = 1; }
+message ConversionResponse  { string filePath = 1; }
+
+service Converter { rpc Convert (ConversionRequest) returns (ConversionResponse); }

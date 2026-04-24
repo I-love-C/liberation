@@ -1,0 +1,10 @@
+.env
+
+# scala
+.scala-build/
+.bloop/
+.metals/
+.bsp
+
+# gen
+src/generated/
