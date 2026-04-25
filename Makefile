@@ -3,7 +3,6 @@ OUT_DIR = src/generated
 PROTO_FILE := $(PROTO_DIR)/conversion.proto
 
 .PHONY: all clean generate run
-
 all: generate run
 
 clean:

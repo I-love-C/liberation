@@ -8,6 +8,9 @@
 // runtime grpc
 //> using dep "com.thesamet.scalapb::scalapb-runtime-grpc:0.11.20"
 
+// JODConverter for LibreOffice
+//> using dep "org.jodconverter:jodconverter-local:4.4.11"
+
 // logs
 //> using dep "org.slf4j:slf4j-simple:2.0.17"
 
