@@ -1,3 +1,6 @@
+-include .env.dev
+export
+
 PROTO_DIR = proto
 OUT_DIR = src/generated
 PROTO_FILE := $(PROTO_DIR)/conversion.proto

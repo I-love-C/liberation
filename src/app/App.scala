@@ -4,12 +4,9 @@ import org.slf4j.LoggerFactory
 class ConverterApp(config: Configuration, ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(getClass)
 
-  val poolManager = ConverterPool.instanceManager
-
-  private val converterService =
-    new ExcelToPdfService(poolManager, ec)
-  private val grpcServer =
-    new ConverterServer(config.port, converterService, ec)
+  private val poolManager = new ConverterPool(config).instanceManager
+  private val converter = new ExcelToPdfService(poolManager, ec)
+  private val grpcServer = new ConverterServer(config.port, converter, ec)
 
   def start(): Unit = {
     logger.info("App startup started")

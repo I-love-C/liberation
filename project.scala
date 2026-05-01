@@ -13,6 +13,3 @@
 
 // logs
 //> using dep "org.slf4j:slf4j-simple:2.0.17"
-
-// .env
-//> using dep "io.github.cdimascio:dotenv-java:3.2.0"

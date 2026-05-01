@@ -1,4 +1,7 @@
+# "prod" env
 .env
+# for dev running locally
+.env.dev
 
 # scala
 .scala-build/
