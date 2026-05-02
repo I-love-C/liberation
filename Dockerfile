@@ -1,6 +1,6 @@
 ARG LIBERATION_JAR_PATH="/app/liberation.jar" # app jar
 
-FROM docker.io/library/ubuntu:24.04 AS builder
+FROM eclipse-temurin:21-jre-jammy AS builder
 
 # installs
 ARG SCALA_CLI_RELEASE="https://github.com/VirtusLab/scala-cli/releases/download/v1.13.0/scala-cli-x86_64-pc-linux.gz"
@@ -33,20 +33,29 @@ COPY Makefile ./
 COPY proto/ ./proto/
 RUN make generate
 
+# dependency cache
+COPY project.scala .
+RUN echo 'object DependenciesInstall extends App' > DependenciesInstall.scala \
+    && scala --power compile --jvm system . \
+    && rm DependenciesInstall.scala
+
 COPY . .
 ARG LIBERATION_JAR_PATH
-RUN scala --power package --assembly -o ${LIBERATION_JAR_PATH} .
+RUN scala --power package --assembly --jvm system -o ${LIBERATION_JAR_PATH} .
 
 FROM eclipse-temurin:21-jre-jammy
 
 # libre office
 RUN apt-get update && apt-get install -y --no-install-recommends    \
-    libreoffice-core  libreoffice-writer libreoffice-calc           \
+    libreoffice-core  libreoffice-writer                            \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 ARG LIBERATION_JAR_PATH
-COPY --from=builder ${LIBERATION_JAR_PATH} /app/liberation.jar
+COPY --from=builder ${LIBERATION_JAR_PATH} ${LIBERATION_JAR_PATH}
 
 ENV LIBERATION_JAR_PATH=${LIBERATION_JAR_PATH}
-ENTRYPOINT java -jar ${LIBERATION_JAR_PATH}
+COPY entrypoint.sh entrypoint.sh
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
