@@ -55,7 +55,4 @@ ARG LIBERATION_JAR_PATH
 COPY --from=builder ${LIBERATION_JAR_PATH} ${LIBERATION_JAR_PATH}
 
 ENV LIBERATION_JAR_PATH=${LIBERATION_JAR_PATH}
-COPY entrypoint.sh entrypoint.sh
-RUN chmod +x entrypoint.sh
-
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT exec java -jar ${LIBERATION_JAR_PATH}
