@@ -1,12 +1,14 @@
-import scala.concurrent.ExecutionContext
 import org.slf4j.LoggerFactory
+import scala.concurrent.ExecutionContext
 
 class ConverterApp(config: Configuration, ec: ExecutionContext) {
   private val logger = LoggerFactory.getLogger(getClass)
 
   private val poolManager = new ConverterPool(config).instanceManager
-  private val converter = new ExcelToPdfService(poolManager, ec)
-  private val grpcServer = new ConverterServer(config.port, converter, ec)
+  private val cache = new ConverterCache(config.cachePath)
+  private val converter = new ExcelToPdfService(poolManager, cache, ec)
+  private val grpcServer =
+    new ConverterServer(config.port, converter, cache, ec)
 
   def start(): Unit = {
     logger.info("App startup started")
@@ -23,7 +25,7 @@ class ConverterApp(config: Configuration, ec: ExecutionContext) {
       logger.info("App started")
     } catch {
       case e: Exception =>
-        logger.error(s"Fatal exception in startup: ${e.getMessage}", e)
+        logger.error(s"Fatal exception during startup: ${e.getMessage}", e)
         stop()
         sys.exit(1)
     }
@@ -31,7 +33,7 @@ class ConverterApp(config: Configuration, ec: ExecutionContext) {
 
   def stop(): Unit = {
     grpcServer.stop(); logger.info("gRPC server shut down")
-    poolManager.stop(); logger.info("process pool freed")
+    poolManager.stop(); logger.info("office pool freed")
   }
 
   def awaitTermination(): Unit = grpcServer.blockUntilShutdown()

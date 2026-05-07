@@ -39,3 +39,7 @@ project is fine right now, simple dependencies, install and structure.
 to make this cool might try optimizations, try to port the current logic to scala native, or rewrite to a different language,
 async stuff might be done, keeping a hashtable with stuff so as to not process identical files multiple times, testing harness needs to be made
 lots of stuff still to do
+
+pretty insane that there is no enum for the different algorithms, seems almost obvious to me if you would like to make logic that is based on this type you would either need then a parent type that happens to also be different or you would need ot make your own
+
+also discovered require, which is pretty cool and used it as much as I could

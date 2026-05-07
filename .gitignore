@@ -11,3 +11,6 @@
 
 # gen
 src/generated/
+
+# excel files for testing
+testfiles
