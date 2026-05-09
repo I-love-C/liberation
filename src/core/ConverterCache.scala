@@ -14,6 +14,7 @@ object ConverterCache {
       require(content.nonEmpty, "no content provided, cannot hash empty content")
       val hashedBytes = MessageDigest.getInstance(encoding.name).digest(content);
       Base64.getUrlEncoder.withoutPadding.encodeToString(hashedBytes)
+
     def fromAttribute(attribute: String): CacheKey = attribute
 
   // relative path because I might down the line want to do directories too
@@ -22,13 +23,14 @@ object ConverterCache {
     def getPath(dirCache: Path, relativePath: Path): Option[LocalFilePath] =
       val path = dirCache.resolve(relativePath)
       if Files.exists(path) then Some(path.toString()) else None
+
     def fromPath(pathString : String): LocalFilePath = pathString
 }
 
-case class ConverterCache(cacheDirectoryPath: Path):
+final case class ConverterCache(private val cacheDirectoryPath: Path):
   import ConverterCache.*
   private val logger = LoggerFactory.getLogger(getClass)
-  private val cache = ConcurrentHashMap[CacheKey, LocalFilePath]()
+  private lazy val cache = ConcurrentHashMap[CacheKey, LocalFilePath]()
 
   def get(key: CacheKey): Option[LocalFilePath] = {
     logger.info(s"Searched for ${key.toString()} in cache")
@@ -42,6 +44,3 @@ case class ConverterCache(cacheDirectoryPath: Path):
       }
      	case None => logger.warn(s"file ${filename.toString()} couldn't be placed in cache")
   }
-  // need functions here not the base ones that will handle getting a file and inserting one
-  // getting one    -> for cache hits
-  // placing one in -> for after the converted file has been sent/while it is being sent.

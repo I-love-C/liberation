@@ -10,8 +10,9 @@ import DefaultDocumentFormatRegistry.*
 import ConverterCache.CacheKey
 import ConverterCache.LocalFilePath
 import java.nio.file.Path
+import java.nio.file.Files
 
-class ExcelToPdfService(
+final class ExcelToPdfService(
     officeManager: OfficeManager,
     cache: ConverterCache,
     ec: ExecutionContext
@@ -41,9 +42,11 @@ class ExcelToPdfService(
               .as(targetFormat)
               .execute()
 
-            val bytes = pdfFile.toString().getBytes()
-            val cachedFilePath =  Path.of(pdfFile.getName()) 
-            cache.put(CacheKey.hash(bytes), cachedFilePath)
+            // TODO: move this away into functions or specific case class
+            val bytes = Files.readAllBytes(pdfFile.toPath)
+            val key = CacheKey.hash(bytes)
+            val pdfCachedFilePath =  Path.of(pdfFile.getName())
+            cache.put(key, pdfCachedFilePath)
 
             ConversionResponse(filePath = pdfFile.getAbsolutePath)
           } catch {

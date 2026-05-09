@@ -2,10 +2,10 @@ import org.slf4j.LoggerFactory
 import java.nio.file.{Path, Files}
 import java.nio.file.LinkOption
 
-case class Configuration(host: String, port: Int, cachePath: Path):
+final case class Configuration(host: String, port: Int, cachePath: Path):
   require(host.nonEmpty,                "HOST must not be empty")
   require(port > 0 && port < 65536,     s"PORT must be a valid port number, got: ${port}")
-  
+
   if !Files.exists(cachePath) then Files.createDirectories(cachePath)
   else if !Files.isDirectory(cachePath) then
     throw new IllegalArgumentException(s"cachePath exists but is not a directory: $cachePath")

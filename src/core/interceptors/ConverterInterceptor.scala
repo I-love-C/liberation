@@ -1,5 +1,7 @@
-import java.io.File
+import io.grpc.Contexts
 import io.grpc.ServerCall.*
+import org.slf4j.LoggerFactory
+import proto.conversion.ConverterGrpc
 import io.grpc.{
   ServerInterceptor,
   ServerCall,
@@ -7,12 +9,8 @@ import io.grpc.{
   ServerCallHandler,
   Context
 }
-import proto.conversion.ConverterGrpc
-import org.slf4j.LoggerFactory
-import io.grpc.Metadata.Key
-import io.grpc.Contexts
 
-case class ConverterInterceptor(cache: ConverterCache)
+final case class ConverterInterceptor(cache: ConverterCache)
     extends ServerInterceptor {
   private val logger = LoggerFactory.getLogger(getClass)
   override def interceptCall[ReqT, RespT](
@@ -20,12 +18,11 @@ case class ConverterInterceptor(cache: ConverterCache)
       headers: Metadata,
       next: ServerCallHandler[ReqT, RespT]
   ): Listener[ReqT] = {
-    val hash = ConverterRequestContext.cacheAttribute.extract(headers)
-    if (hash.isDefined) logger.debug("Request with cache headers came in")
-
-    val ctx = hash.foldLeft(Context.current()) { (c, v) =>
-      ConverterRequestContext.cacheAttribute.withValue(c, v)
-    }
+    val ctx = ConverterRequestContext.cacheAttribute.extract(headers) match
+      case Some(hash) =>
+        logger.debug(s"Request with cache header: $hash")
+        ConverterRequestContext.cacheAttribute.withValue(Context.current(), hash)
+      case None => Context.current()
 
     Contexts.interceptCall(ctx, call, headers, next)
   }

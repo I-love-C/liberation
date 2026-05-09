@@ -1,14 +1,18 @@
 import org.slf4j.LoggerFactory
 import scala.concurrent.ExecutionContext
 
-class ConverterApp(config: Configuration, ec: ExecutionContext) {
+final class ConverterApp(
+    private val config: Configuration,
+    private val ec: ExecutionContext
+) {
   private val logger = LoggerFactory.getLogger(getClass)
+  private val port = config.port
+  private val cachePath = config.cachePath
 
-  private val poolManager = new ConverterPool(config).instanceManager
-  private val cache = new ConverterCache(config.cachePath)
+  private val poolManager = new ConverterPool(port).instanceManager
+  private val cache = new ConverterCache(cachePath)
   private val converter = new ExcelToPdfService(poolManager, cache, ec)
-  private val grpcServer =
-    new ConverterServer(config.port, converter, cache, ec)
+  private val grpcServer = new ConverterServer(port, converter, cache, ec)
 
   def start(): Unit = {
     logger.info("App startup started")
